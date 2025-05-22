@@ -14,6 +14,7 @@ class DatabaseConnection:
             self.connection.close()
         if exc_type is not None:
             print(f"An error occurred: {exc_value}")
+        return True
             
 
 with DatabaseConnection('users.db') as conn:
