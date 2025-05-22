@@ -8,7 +8,7 @@ def connect_db():
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="your_password"  # Replace with your actual MySQL password
+            password="your_password"
         )
         return connection
     except mysql.connector.Error as err:
@@ -28,7 +28,7 @@ def connect_to_prodev():
         connection = mysql.connector.connect(
             host="localhost",
             user="root",
-            password="your_password",  # Replace with your actual MySQL password
+            password="your_password",
             database="ALX_prodev"
         )
         return connection
