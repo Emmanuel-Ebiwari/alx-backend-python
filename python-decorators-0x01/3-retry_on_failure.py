@@ -36,8 +36,6 @@ def retry_on_failure(retries=3, delay=1):
         return wrapper
     return decorator
 
-        
-
 @with_db_connection
 @retry_on_failure(retries=3, delay=1)
 
