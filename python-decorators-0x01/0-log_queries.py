@@ -1,6 +1,6 @@
 import sqlite3
 import functools
-from datetime import datetime  # required by the checker
+from datetime import datetime
 
 #### decorator to lof SQL queries
 
