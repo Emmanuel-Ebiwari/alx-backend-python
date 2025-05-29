@@ -78,11 +78,7 @@ class TestGetJson(unittest.TestCase):
 class TestMemoize(unittest.TestCase):
     """Test suite for the memoize function."""
 
-    @parameterized.expand([
-        ("first_call", 42),
-        ("second_call", 42),
-    ])
-    def test_memoize(self, _, expected_value: int) -> None:
+    def test_memoize(self) -> None:
         """
         Test that memoize caches the result of a function call.
         """
@@ -90,6 +86,7 @@ class TestMemoize(unittest.TestCase):
 
             def a_method(self) -> int:
                 """A method that returns a fixed value."""
+                print("a_method called")
                 return 42
 
             @memoize
@@ -100,7 +97,7 @@ class TestMemoize(unittest.TestCase):
         with patch.object(
             TestClass,
             "a_method",
-            return_value=expected_value
+            return_value=42
         ) as mock_method:
             instance = TestClass()
 
@@ -108,9 +105,11 @@ class TestMemoize(unittest.TestCase):
             result1 = instance.a_property
             # Second call: should use cached value
             result2 = instance.a_property
+            print("First call result:", result1)
+            print("Second call result:", result2)
 
-            self.assertEqual(result1, expected_value)
-            self.assertEqual(result2, expected_value)
+            self.assertEqual(result1, 42)
+            self.assertEqual(result2, 42)
 
             # Ensure a_method was called only once due to memoization
             mock_method.assert_called_once_with()
