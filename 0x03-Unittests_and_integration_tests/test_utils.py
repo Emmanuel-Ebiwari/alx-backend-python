@@ -82,7 +82,7 @@ class TestMemoize(unittest.TestCase):
         ("first_call", 42),
         ("second_call", 42),
     ])
-    def test_memoize(self, _, expected_value: int) -> None:
+    def test_memoize(self, expected_value: int) -> None:
         """
         Test that memoize caches the result of a function call.
         """
