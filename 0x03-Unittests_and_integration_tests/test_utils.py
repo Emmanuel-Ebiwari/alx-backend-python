@@ -86,7 +86,6 @@ class TestMemoize(unittest.TestCase):
 
             def a_method(self) -> int:
                 """A method that returns a fixed value."""
-                print("a_method called")
                 return 42
 
             @memoize
@@ -105,8 +104,6 @@ class TestMemoize(unittest.TestCase):
             result1 = instance.a_property
             # Second call: should use cached value
             result2 = instance.a_property
-            print("First call result:", result1)
-            print("Second call result:", result2)
 
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
