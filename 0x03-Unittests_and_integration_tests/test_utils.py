@@ -61,7 +61,8 @@ class TestGetJson(unittest.TestCase):
         """
         Test that get_json returns a dictionary when provided with a valid URL.
         """
-        # Using `with patch` to avoid issues with argument order in @parameterized.expand
+        # Using `with patch` to avoid issues with
+        # argument order in @parameterized.expand
         with patch('utils.requests.get') as mock_get:
             mock_response = Mock()
             mock_response.json.return_value = expected_value
@@ -97,7 +98,11 @@ class TestMemoize(unittest.TestCase):
                 """A property that calls a_method and caches the result."""
                 return self.a_method()
 
-        with patch.object(TestClass, "a_method", return_value=expected_value) as mock_method:
+        with patch.object(
+            TestClass,
+            "a_method",
+            return_value=expected_value
+        ) as mock_method:
             instance = TestClass()
 
             # First call: should trigger a_method
