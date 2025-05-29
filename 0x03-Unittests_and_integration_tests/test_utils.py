@@ -3,7 +3,7 @@
 """
 import unittest
 from unittest.mock import patch, Mock
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 from parameterized import parameterized
 from typing import (
     Mapping,
@@ -72,6 +72,44 @@ class TestGetJson(unittest.TestCase):
 
             # Assert that requests.get was called once with the correct URL
             mock_get.assert_called_once_with(test_url)
+
+
+class TestMemoize(unittest.TestCase):
+    """Test suite for the memoize function."""
+
+    @parameterized.expand([
+        (42,),
+        (42,),
+    ])
+    def test_memoize(self, expected_value: int) -> None:
+        """
+        Test that memoize caches the result of a function call.
+        """
+        class TestClass:
+
+            def a_method(self) -> int:
+                """A method that returns a fixed value."""
+                print("a_method called")
+                return 42
+
+            @memoize
+            def a_property(self) -> int:
+                """A property that calls a_method and caches the result."""
+                return self.a_method()
+
+        with patch.object(TestClass, "a_method", return_value=expected_value) as mock_method:
+            instance = TestClass()
+
+            # First call: should trigger a_method
+            result1 = instance.a_property
+            # Second call: should use cached value
+            result2 = instance.a_property
+
+            self.assertEqual(result1, expected_value)
+            self.assertEqual(result2, expected_value)
+
+            # Ensure a_method was called only once due to memoization
+            mock_method.assert_called_once_with()
 
 
 if __name__ == "__main__":
