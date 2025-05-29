@@ -39,10 +39,16 @@ class TestGithubOrgClient(unittest.TestCase):
         """
         Test that the _public_repos_url property returns the correct URL.
         """
-        with patch.object(GithubOrgClient, 'org', new_callable=PropertyMock) as mock_org:
+        with patch.object(
+            GithubOrgClient,
+            'org',
+            new_callable=PropertyMock
+        ) as mock_org:
+
             expected_url = "https://api.github.com/orgs/google"
             mock_org.return_value = {
                 "repos_url": expected_url}
+
             client = GithubOrgClient("google")
             self.assertEqual(client._public_repos_url, expected_url)
 
@@ -51,7 +57,12 @@ class TestGithubOrgClient(unittest.TestCase):
         """
         Test that public_repos returns the correct list of repository names.
         """
-        with patch.object(GithubOrgClient, '_public_repos_url', new_callable=PropertyMock) as mock_public_repo_url:
+        with patch.object(
+            GithubOrgClient,
+            '_public_repos_url',
+            new_callable=PropertyMock
+        ) as mock_public_repo_url:
+
             expected_url = 'https://api.github.com/orgs/microsoft'
             mock_public_repo_url.return_value = expected_url
             mock_get_json.return_value = [
@@ -59,6 +70,7 @@ class TestGithubOrgClient(unittest.TestCase):
                 {"name": "repo2", "license": {"key": "GPL"}},
                 {"name": "repo3", "license": None},
             ]
+
             client = GithubOrgClient("microsoft")
             result = client.public_repos(license="MIT")
             expected_result = ["repo1"]
