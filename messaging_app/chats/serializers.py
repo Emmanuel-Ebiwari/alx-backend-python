@@ -1,8 +1,20 @@
 from rest_framework import serializers
 from .models import User, Conversation, Message
+from django.core.validators import validate_email as django_validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 
 class UserSerializer(serializers.ModelSerializer):
+    role = serializers.CharField()
+
+    def validate_email(self, value):
+        try:
+            # Uses Django's robust built-in email regex
+            django_validate_email(value)
+        except DjangoValidationError:
+            raise serializers.ValidationError("Enter a valid email address.")
+        return value
+
     class Meta:
         model = User
         fields = ['user_id', 'first_name', 'last_name',
@@ -23,6 +35,14 @@ class MessageSerializer(serializers.ModelSerializer):
 class ConversationSerializer(serializers.ModelSerializer):
     participants = UserSerializer(many=True, read_only=True)
     messages = MessageSerializer(many=True, read_only=True)
+    # get the last message preview
+    last_message_preview = serializers.SerializerMethodField()
+
+    def get_last_message_preview(self, obj):
+        last_msg = obj.messages.last()
+        if last_msg:
+            return last_msg.message_body[:50] + '...'
+        return None
 
     class Meta:
         model = Conversation
