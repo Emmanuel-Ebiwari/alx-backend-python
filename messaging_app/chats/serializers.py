@@ -5,7 +5,7 @@ from .models import User, Conversation, Message
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'first_name', 'last_name',
+        fields = ['user_id', 'first_name', 'last_name',
                   'email', 'phone_number', 'role', 'date_joined']
 
 
@@ -26,4 +26,5 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Conversation
-        fields = ['id', 'name', 'participants', 'messages', 'created_at']
+        fields = ['conversation_id', 'name',
+                  'participants', 'messages', 'created_at']
