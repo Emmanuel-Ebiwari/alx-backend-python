@@ -5,7 +5,7 @@ from django.db import models
 
 class User(AbstractUser):
     # Override default ID to UUID
-    id = models.UUIDField(
+    user_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
 
     # Already inherited: username, first_name, last_name, email, password, etc.
@@ -26,7 +26,7 @@ class User(AbstractUser):
 
 
 class Conversation(models.Model):
-    id = models.UUIDField(
+    conversation_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     name = models.CharField(max_length=255)
     participants = models.ManyToManyField('User', related_name='conversations')
