@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from rest_framework import permissions, viewsets, status, filters, Response
+from rest_framework import permissions, viewsets, status, filters
+from rest_framework.response import Response
 from .models import User, Conversation, Message
 from .serializers import UserSerializer, ConversationSerializer, MessageSerializer
 
