@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from .pagination import MessagePagination
 from .filters import MessageFilter
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
@@ -45,7 +45,7 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated, IsSender]
-    pagination_class = pagination.PageNumberPagination
+    pagination_class = MessagePagination
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = MessageFilter
 
