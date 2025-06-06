@@ -1,9 +1,12 @@
 from django.shortcuts import render
-from rest_framework import permissions, viewsets, status, filters
+from .filters import MessageFilter
+from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
+from rest_framework import pagination
 from .models import User, Conversation, Message
 from .serializers import UserSerializer, ConversationSerializer, MessageSerializer
 from .permissions import IsSender, IsParticipantOfConversation
+from django_filters import rest_framework as filters
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -11,12 +14,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     permission_classes = [permissions.IsAuthenticated,
                           IsSender, IsParticipantOfConversation]
-    filter_backends = [filters.OrderingFilter]
+    # filter_backends = [filters.OrderingFilter]
     ordering_fields = ['sent_at']
-
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        return Response(response.data, status=status.HTTP_201_CREATED)
 
     def create(self, request, *args, **kwargs):
         conversation_id = request.data.get("conversation")
@@ -35,7 +34,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+        return Response(response.data, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         return Message.objects.filter(sender=self.request.user)
@@ -45,6 +45,9 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [permissions.IsAuthenticated, IsSender]
+    pagination_class = pagination.PageNumberPagination
+    filter_backends = (filters.DjangoFilterBackend,)
+    filter_class = MessageFilter
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
