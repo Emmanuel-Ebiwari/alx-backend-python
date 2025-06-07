@@ -147,3 +147,12 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = 'chats.User'
+
+# JWT settings
+"""
+overriding the default user ID field and claim for JWT
+"""
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'username',
+    'USER_ID_CLAIM': 'user_id',
+}

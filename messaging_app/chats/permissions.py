@@ -22,11 +22,5 @@ class IsParticipantOfConversation (permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         # Check if the user is a participant in the conversation
         if request.method in ['PUT', 'PATCH', 'DELETE', 'GET']:
-            print(
-                f"Checking if user {request.user} is a participant in conversation {obj.conversation}")
-            if hasattr(obj, 'conversation'):
-                # Ensure the conversation attribute exists
-                print(
-                    f"Conversation participants: {obj.conversation.participants.all()}")
             return request.user in obj.conversation.participants.all()
         return False

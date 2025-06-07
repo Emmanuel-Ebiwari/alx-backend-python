@@ -14,31 +14,28 @@ class ConversationViewSet(viewsets.ModelViewSet):
     serializer_class = ConversationSerializer
     permission_classes = [permissions.IsAuthenticated,
                           IsSender, IsParticipantOfConversation]
-    # filter_backends = [filters.OrderingFilter]
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_fields = ['participants', 'created_at']
     ordering_fields = ['sent_at']
 
     def create(self, request, *args, **kwargs):
-        conversation_id = request.data.get("conversation")
-        if not conversation_id:
-            return Response({"detail": "Missing conversation ID."}, status=status.HTTP_400_BAD_REQUEST)
-
-        from .models import Conversation  # Local import to avoid circular issues
-        try:
-            conversation = Conversation.objects.get(pk=conversation_id)
-        except Conversation.DoesNotExist:
-            return Response({"detail": "Conversation not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        if request.user not in conversation.participants.all():
+        participants = request.data.get("participants", [])
+        if not participants:
             return Response(
-                {"detail": "You are not a participant in this conversation."},
+                {"detail": "Participants list cannot be empty."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        user_id_str = str(request.user.user_id)  # Ensure user_id is a string
+        if user_id_str not in participants:
+            return Response(
+                {"detail": "You must be one of the participants to create this conversation."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        response = super().create(request, *args, **kwargs)
-        return Response(response.data, status=status.HTTP_201_CREATED)
+        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
-        return Message.objects.filter(sender=self.request.user)
+        return Conversation.objects.filter(participants=self.request.user).order_by('-created_at')
 
 
 class MessageViewSet(viewsets.ModelViewSet):
@@ -49,9 +46,18 @@ class MessageViewSet(viewsets.ModelViewSet):
     filter_backends = (filters.DjangoFilterBackend,)
     filter_class = MessageFilter
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        return Response(response.data, status=status.HTTP_201_CREATED)
-
     def get_queryset(self):
-        return Message.objects.filter(sender=self.request.user)
+        conversation_id = self.kwargs["conversation_pk"]
+        return Message.objects.filter(conversation_id=conversation_id).order_by('-created_at')
+
+    def perform_create(self, serializer):
+        conversation_id = self.kwargs["conversation_pk"]
+        conversation = Conversation.objects.get(pk=conversation_id)
+        serializer.save(sender=self.request.user, conversation=conversation)
+
+    # def create(self, request, *args, **kwargs):
+    #     response = super().create(request, *args, **kwargs)
+    #     return Response(response.data, status=status.HTTP_201_CREATED)
+
+    # def get_queryset(self):
+    #     return Message.objects.filter(sender=self.request.user)

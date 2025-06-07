@@ -28,12 +28,14 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['message_id', 'sender',
-                  'recipient', 'message_body', 'sent_at']
-        read_only_fields = ('sender', 'sent_at', 'recipient')
+                  'recipient', 'message_body', 'sent_at', 'conversation']
+        read_only_fields = ('sender', 'sent_at', 'recipient', 'conversation')
 
 
 class ConversationSerializer(serializers.ModelSerializer):
-    participants = UserSerializer(many=True, read_only=True)
+    participants = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=User.objects.all()
+    )
     messages = MessageSerializer(many=True, read_only=True)
     # get the last message preview
     last_message_preview = serializers.SerializerMethodField()
@@ -47,4 +49,5 @@ class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
         fields = ['conversation_id', 'name',
-                  'participants', 'messages', 'created_at']
+                  'participants', 'messages', 'created_at', 'last_message_preview']
+        read_only_fields = ['conversation_id', 'messages', 'created_at']
