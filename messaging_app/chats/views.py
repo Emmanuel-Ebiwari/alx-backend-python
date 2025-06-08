@@ -48,7 +48,7 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         conversation_id = self.kwargs["conversation_pk"]
-        return Message.objects.filter(conversation_id=conversation_id).order_by('-created_at')
+        return Message.objects.filter(conversation_id=conversation_id).order_by('-sent_at')
 
     def perform_create(self, serializer):
         conversation_id = self.kwargs["conversation_pk"]
