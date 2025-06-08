@@ -66,7 +66,7 @@ class OffensiveLanguageMiddleware:
 
             cache.set(cache_key, data, timeout=self.TIME_WINDOW)
 
-        return None  # continue as usual
+        return self.get_response(request)
 
 
 class RolepermissionMiddleware:
@@ -75,7 +75,7 @@ class RolepermissionMiddleware:
         # One-time configuration and initialization.
 
     def __call__(self, request):
-        if request.user.role == 'admin' or request.user.role == 'moderator':
+        if request.user.is_authenticated and (request.user.role == 'admin' or request.user.role == 'moderator'):
             # Allow access to admin users
             return self.get_response(request)
         else:
