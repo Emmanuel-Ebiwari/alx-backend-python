@@ -67,3 +67,17 @@ class OffensiveLanguageMiddleware:
             cache.set(cache_key, data, timeout=self.TIME_WINDOW)
 
         return None  # continue as usual
+
+
+class RolepermissionMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        if request.user.role == 'admin' or request.user.role == 'moderator':
+            # Allow access to admin users
+            return self.get_response(request)
+        else:
+            # Deny access for other roles
+            return HttpResponse("Access denied.", status=403, content_type="text/plain")
