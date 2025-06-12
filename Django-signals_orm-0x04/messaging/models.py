@@ -9,6 +9,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(
         'auth.User', on_delete=models.CASCADE, related_name='received_messages')
     content = models.TextField()
+    edited = models.BooleanField(default=False)
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -25,3 +26,17 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.user} regarding message {self.message.id} at {self.timestamp}"
+
+
+class MessageHistory(models.Model):
+    message = models.ForeignKey(
+        Message, on_delete=models.CASCADE, related_name='history')
+    edited_by = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, null=True, related_name='message_history')
+    edited_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-edited_at']
+
+    def __str__(self):
+        return f"History for message {self.message.id}: {self.action} at {self.edited_at}"
