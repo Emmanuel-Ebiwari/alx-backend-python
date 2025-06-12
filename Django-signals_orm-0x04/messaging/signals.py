@@ -1,6 +1,7 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from .models import Message, Notification, MessageHistory
+from django.contrib.auth.models import User
 
 
 @receiver(post_save, sender=Message)
@@ -33,3 +34,14 @@ def message_pre_save(sender, instance, **kwargs):
     else:
         # Logic for new messages (handled in post_save)
         pass
+
+
+@receiver(post_delete, sender=User)
+def message_post_delete(sender, instance, **kwargs):
+    # Logic to handle the deletion of a message
+    Message.objects.filter(sender=instance).delete()
+    Notification.objects.filter(user=instance).delete()
+    MessageHistory.objects.filter(
+        message__sender=instance).delete()
+    print(
+        f"User deleted: {instance.username}")
