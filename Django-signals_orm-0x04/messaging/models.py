@@ -10,6 +10,8 @@ class Message(models.Model):
         'auth.User', on_delete=models.CASCADE, related_name='received_messages')
     content = models.TextField()
     edited = models.BooleanField(default=False)
+    parent_message = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
