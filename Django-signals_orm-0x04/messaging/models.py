@@ -1,6 +1,5 @@
 from django.db import models
-
-# Create your models here.
+from .managers import UnreadMessagesManager
 
 
 class Message(models.Model):
@@ -13,6 +12,9 @@ class Message(models.Model):
     parent_message = models.ForeignKey(
         'self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
     timestamp = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+
+    unread = UnreadMessagesManager()
 
     def __str__(self):
         return f"Message from {self.sender} to {self.receiver} at {self.timestamp}"

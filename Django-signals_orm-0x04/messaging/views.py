@@ -6,6 +6,16 @@ from django.contrib.auth.models import User
 from .serializers import MessageSerializer
 
 
+def serialize_message(message):
+    return {
+        'id': message.id,
+        'sender': message.sender.username,
+        'content': message.content,
+        'timestamp': message.timestamp,
+        'replies': [serialize_message(reply) for reply in message.replies.all()]
+    }
+
+
 @api_view(['DELETE'])
 def delete_user(request, user_id):
     try:
@@ -37,16 +47,6 @@ def reply_message(request, message_id):
 # utils.py or inline
 
 
-def serialize_message(message):
-    return {
-        'id': message.id,
-        'sender': message.sender.username,
-        'content': message.content,
-        'timestamp': message.timestamp,
-        'replies': [serialize_message(reply) for reply in message.replies.all()]
-    }
-
-
 @api_view(['GET'])
 def get_threaded_conversations(request):
     top_level_messages = Message.objects.filter(parent_message__isnull=True) \
@@ -55,3 +55,13 @@ def get_threaded_conversations(request):
 
     data = [serialize_message(msg) for msg in top_level_messages]
     return Response(data)
+
+
+@api_view(['GET'])
+def get_unread_messages(request):
+    unread_messages = Message.unread.filter(receiver=request.user) \
+        .only('id', 'sender', 'content', 'timestamp') \
+        .select_related('sender') \
+        .values('id', 'sender__username', 'content', 'timestamp')
+
+    return Response(list(unread_messages))
