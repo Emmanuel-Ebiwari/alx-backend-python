@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from .models import Message
 from django.contrib.auth.models import User
 from .serializers import MessageSerializer
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_cookie
+from django.db.models import Q
 
 
 def serialize_message(message):
@@ -65,3 +68,18 @@ def get_unread_messages(request):
         .values('id', 'sender__username', 'content', 'timestamp')
 
     return Response(list(unread_messages))
+
+
+@cache_page(60 * 1)
+@vary_on_cookie
+@api_view(["GET"])
+def get_messages_conversations(request):
+    conversations = Message.objects.filter(
+        Q(sender=request.user) | Q(receiver=request.user)
+    ).distinct()
+
+    data = []
+    for msg in conversations:
+        data.append(serialize_message(msg))
+
+    return Response(data)
