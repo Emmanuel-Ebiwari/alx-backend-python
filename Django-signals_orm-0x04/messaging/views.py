@@ -59,7 +59,7 @@ def get_threaded_conversations(request):
 
 @api_view(['GET'])
 def get_unread_messages(request):
-    unread_messages = Message.unread.filter(receiver=request.user) \
+    unread_messages = Message.unread.unread_for_user(receiver=request.user) \
         .only('id', 'sender', 'content', 'timestamp') \
         .select_related('sender') \
         .values('id', 'sender__username', 'content', 'timestamp')
