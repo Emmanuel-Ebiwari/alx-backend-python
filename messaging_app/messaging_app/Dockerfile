@@ -15,11 +15,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY Requirements.txt .
-RUN pip install --upgrade pip && pip install -r Requirements.txt
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy project files
 COPY . .
+
+# Note: The container should be run with -p 8000:8000 to publish the exposed port
+# Example: docker run -p 8000:8000 messaging_app
 
 # Expose port (default for Django)
 EXPOSE 8000
