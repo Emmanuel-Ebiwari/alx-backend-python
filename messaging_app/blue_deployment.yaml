@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: messaging-app
-          image: emmaebi/messaging_app-web:latest
+          image: emmaebi/messaging_app-web:2.0
           ports:
             - containerPort: 8000
