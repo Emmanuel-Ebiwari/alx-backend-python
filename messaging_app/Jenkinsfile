@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = 'emmanuelhub/messaging-app:latest'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -9,7 +13,7 @@ pipeline {
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
                         url: 'https://github.com/Emmanuel-Ebiwari/alx-backend-python.git',
-                        credentialsId: 'github-token'
+                        credentialsId: 'github-credential'
                     ]]
                 ]
                 sh 'git branch'
@@ -22,7 +26,7 @@ pipeline {
                 cd messaging_app
                 python3 -m venv venv
                 source venv/bin/activate
-                pip3 install -r messaging_app/requirements.txt
+                pip install -r messaging_app/requirements.txt
                 '''
             }
         }
@@ -30,16 +34,40 @@ pipeline {
         stage('Run Tests') {
             steps {
                 sh '''
+                cd messaging_app
                 source venv/bin/activate
-                pytest --junitxml=report.xml
+                pytest messaging_app/ --junitxml=report.xml
                 '''
             }
         }
 
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                cd messaging_app
+                docker build -t $DOCKER_IMAGE .
+                '''
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push $DOCKER_IMAGE
+                    '''
+                }
+            }
+        }
+
         stage('Publish Report') {
+            steps {
+                echo 'Preparing test report...'
+            }
             post {
                 always {
-                    junit 'report.xml'
+                    junit 'messaging_app/report.xml'
                 }
             }
         }
