@@ -36,7 +36,7 @@ pipeline {
                 sh '''
                 cd messaging_app
                 . venv/bin/activate
-                pytest chat/tests --junitxml=report.xml
+                pytest chats/tests --junitxml=report.xml
                 '''
             }
         }
