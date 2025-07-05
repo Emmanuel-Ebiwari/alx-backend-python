@@ -1,23 +1,19 @@
 pipeline {
     agent any
 
-    environment {
-        GITHUB_CREDENTIALS = credentials('github-creds')
-    }
-
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git credentialsId: "${GITHUB_CREDENTIALS}", url: 'https://github.com/Emmanuel-Ebiwari/alx-backend-python/tree/main/messaging_app', branch: 'main'
+                checkout scm
+                sh 'git branch'
             }
         }
 
-        stage('Set up Python') {
+        stage('Setup Python') {
             steps {
                 sh '''
                 python3 -m venv venv
-                source venv/bin/activate
-                pip3 install --upgrade pip
+                source messaging_app/venv/bin/activate
                 pip3 install -r messaging_app/requirements.txt
                 '''
             }
@@ -35,7 +31,7 @@ pipeline {
         stage('Publish Report') {
             post {
                 always {
-                    junit 'report.xml'
+                    junit 'messaging_app/report.xml'
                 }
             }
         }
