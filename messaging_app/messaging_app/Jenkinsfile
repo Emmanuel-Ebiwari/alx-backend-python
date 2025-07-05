@@ -1,9 +1,11 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = 'emmaebi/messaging_app-web:latest'
-    }
+    // environment {
+    //     DOCKER_IMAGE = 'emmaebi/messaging_app-web:latest'
+    // }
+    def DOCKER_IMAGE = "emmaebi/messaging_app-web"
+    def DOCKER_CONTEXT = "messaging_app"
 
     stages {
         stage('Checkout') {
@@ -64,8 +66,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    def DOCKER_IMAGE = "emmaebi/messaging_app-web"
-                    docker.build(DOCKER_IMAGE)
+                    docker.build(DOCKER_IMAGE, "-f ${DOCKER_CONTEXT}/Dockerfile ${DOCKER_CONTEXT}")
                 }
             }
         }
@@ -73,7 +74,6 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    def DOCKER_IMAGE = "emmaebi/messaging_app-web"
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
                         docker.image(DOCKER_IMAGE).push('latest')
                     }
