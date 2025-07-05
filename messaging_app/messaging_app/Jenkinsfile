@@ -24,6 +24,8 @@ pipeline {
             steps {
                 sh '''
                 cd messaging_app
+                python3 -v
+                python -v
                 python3 -m venv venv
                 source venv/bin/activate
                 pip install -r messaging_app/requirements.txt
