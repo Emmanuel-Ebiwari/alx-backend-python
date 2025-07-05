@@ -25,7 +25,7 @@ pipeline {
                 sh '''
                 cd messaging_app
                 python3 -m venv venv
-                source venv/bin/activate
+                . venv/bin/activate
                 pip install -r messaging_app/requirements.txt
                 '''
             }
@@ -35,8 +35,8 @@ pipeline {
             steps {
                 sh '''
                 cd messaging_app
-                source venv/bin/activate
-                pytest messaging_app/ --junitxml=report.xml
+                . venv/bin/activate
+                pytest --junitxml=report.xml
                 '''
             }
         }
