@@ -1,11 +1,12 @@
+def DOCKER_IMAGE = "emmaebi/messaging_app-web"
+def DOCKER_CONTEXT = "messaging_app"
+
 pipeline {
     agent any
 
     // environment {
     //     DOCKER_IMAGE = 'emmaebi/messaging_app-web:latest'
     // }
-    def DOCKER_IMAGE = "emmaebi/messaging_app-web"
-    def DOCKER_CONTEXT = "messaging_app"
 
     stages {
         stage('Checkout') {
